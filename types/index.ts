@@ -15,7 +15,53 @@ export interface ChildProgress {
   lastMissionLevelId: number;
 }
 
-export type GameType = 'find_syllable' | 'read_card' | 'memory';
+export type LetterFamily = 'vowel' | 'consonant';
+
+export interface LetterItem {
+  id: string;
+  text: string;
+  type: LetterFamily;
+}
+
+export type GameType =
+  | 'letter_family_intro'
+  | 'observe_letters'
+  | 'sort_letter'
+  | 'find_vowel'
+  | 'find_consonant'
+  | 'letter_family_memory'
+  | 'find_syllable'
+  | 'read_card'
+  | 'memory';
+
+export interface LetterFamilyIntroGame {
+  type: 'letter_family_intro';
+}
+
+export interface ObserveLettersGame {
+  type: 'observe_letters';
+  examples: LetterItem[];
+}
+
+export interface SortLetterGame {
+  type: 'sort_letter';
+  letter: LetterItem;
+}
+
+export interface FindVowelGame {
+  type: 'find_vowel';
+  choices: LetterItem[];
+}
+
+export interface FindConsonantGame {
+  type: 'find_consonant';
+  choices: LetterItem[];
+}
+
+export interface LetterFamilyMemoryGame {
+  type: 'letter_family_memory';
+  cards: LetterItem[];
+}
 
 export interface FindSyllableGame {
   type: 'find_syllable';
@@ -33,7 +79,16 @@ export interface MemoryGame {
   cards: string[];
 }
 
-export type Game = FindSyllableGame | ReadCardGame | MemoryGame;
+export type Game =
+  | LetterFamilyIntroGame
+  | ObserveLettersGame
+  | SortLetterGame
+  | FindVowelGame
+  | FindConsonantGame
+  | LetterFamilyMemoryGame
+  | FindSyllableGame
+  | ReadCardGame
+  | MemoryGame;
 
 export interface Mission {
   id: string;
@@ -41,7 +96,7 @@ export interface Mission {
   games: Game[];
 }
 
-export type LevelType = 'vowels' | 'syllables' | 'mixed' | 'words' | 'sentences';
+export type LevelType = 'letter_families' | 'vowels' | 'syllables' | 'mixed' | 'words' | 'sentences';
 
 export interface Level {
   id: number;

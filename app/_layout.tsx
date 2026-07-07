@@ -37,6 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(main)" />
+        <Stack.Screen name="mission" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />

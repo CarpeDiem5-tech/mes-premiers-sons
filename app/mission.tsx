@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
-import { COLORS, FONT, SPACING, RADIUS } from '../../utils/theme';
-import GameLayout from '../../components/GameLayout';
-import FindSyllableGameView from '../../games/FindSyllableGameView';
-import ReadCardGameView from '../../games/ReadCardGameView';
-import MemoryGameView from '../../games/MemoryGameView';
-import { generateMission } from '../../utils/generateMission';
-import { getLevelById } from '../../data/levels';
-import { getActiveProfileId } from '../../storage/profiles';
-import { recordMissionComplete } from '../../storage/progress';
-import { Mission } from '../../types';
+import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
+import GameLayout from '../components/GameLayout';
+import LetterFamilyIntroGameView from '../games/LetterFamilyIntroGameView';
+import ObserveLettersGameView from '../games/ObserveLettersGameView';
+import SortLetterGame from '../games/SortLetterGame';
+import FindVowelGame from '../games/FindVowelGame';
+import FindConsonantGame from '../games/FindConsonantGame';
+import LetterFamilyMemoryGame from '../games/LetterFamilyMemoryGame';
+import FindSyllableGameView from '../games/FindSyllableGameView';
+import ReadCardGameView from '../games/ReadCardGameView';
+import MemoryGameView from '../games/MemoryGameView';
+import { generateMission } from '../utils/generateMission';
+import { getLevelById } from '../data/levels';
+import { getActiveProfileId } from '../storage/profiles';
+import { recordMissionComplete } from '../storage/progress';
+import { Mission } from '../types';
 
 type Phase = 'ready' | 'playing' | 'complete';
 
@@ -66,7 +72,23 @@ export default function MissionScreen() {
             {mission.games.map((g, i) => (
               <View key={i} style={[styles.readyGameChip, { backgroundColor: level.color + '22' }]}>
                 <Text style={[styles.readyGameText, { color: level.color }]}>
-                  {g.type === 'find_syllable' ? '🔍 Trouve la syllabe' : g.type === 'read_card' ? '📖 Lis la carte' : '🃏 Memory'}
+                  {g.type === 'letter_family_intro'
+                    ? '🏠 Les deux maisons'
+                    : g.type === 'observe_letters'
+                    ? '👀 Observe les lettres'
+                    : g.type === 'sort_letter'
+                    ? '🏡 Range la lettre'
+                    : g.type === 'find_vowel'
+                    ? '🔎 Trouve la voyelle'
+                    : g.type === 'find_consonant'
+                    ? '🔎 Trouve la consonne'
+                    : g.type === 'letter_family_memory'
+                    ? '🃏 Memory des familles'
+                    : g.type === 'find_syllable'
+                    ? '🔍 Trouve la syllabe'
+                    : g.type === 'read_card'
+                    ? '📖 Lis la carte'
+                    : '🃏 Memory'}
                 </Text>
               </View>
             ))}
@@ -109,7 +131,19 @@ export default function MissionScreen() {
   return (
     <GameLayout
       title={
-        currentGame.type === 'find_syllable'
+        currentGame.type === 'letter_family_intro'
+          ? 'Deux familles !'
+          : currentGame.type === 'observe_letters'
+          ? 'Observe !'
+          : currentGame.type === 'sort_letter'
+          ? 'Range la lettre !'
+          : currentGame.type === 'find_vowel'
+          ? 'Trouve la voyelle !'
+          : currentGame.type === 'find_consonant'
+          ? 'Trouve la consonne !'
+          : currentGame.type === 'letter_family_memory'
+          ? 'Memory des familles !'
+          : currentGame.type === 'find_syllable'
           ? 'Trouve la syllabe !'
           : currentGame.type === 'read_card'
           ? 'Lis la carte !'
@@ -120,6 +154,47 @@ export default function MissionScreen() {
       levelColor={level.color}
       onBack={() => router.back()}
     >
+      {currentGame.type === 'letter_family_intro' && (
+        <LetterFamilyIntroGameView
+          key={`intro-${gameIndex}`}
+          onComplete={handleGameComplete}
+        />
+      )}
+      {currentGame.type === 'observe_letters' && (
+        <ObserveLettersGameView
+          key={`observe-${gameIndex}`}
+          game={currentGame}
+          onComplete={handleGameComplete}
+        />
+      )}
+      {currentGame.type === 'sort_letter' && (
+        <SortLetterGame
+          key={`sort-${gameIndex}`}
+          game={currentGame}
+          onComplete={handleGameComplete}
+        />
+      )}
+      {currentGame.type === 'find_vowel' && (
+        <FindVowelGame
+          key={`vowel-${gameIndex}`}
+          game={currentGame}
+          onComplete={handleGameComplete}
+        />
+      )}
+      {currentGame.type === 'find_consonant' && (
+        <FindConsonantGame
+          key={`consonant-${gameIndex}`}
+          game={currentGame}
+          onComplete={handleGameComplete}
+        />
+      )}
+      {currentGame.type === 'letter_family_memory' && (
+        <LetterFamilyMemoryGame
+          key={`family-memory-${gameIndex}`}
+          game={currentGame}
+          onComplete={handleGameComplete}
+        />
+      )}
       {currentGame.type === 'find_syllable' && (
         <FindSyllableGameView
           key={`find-${gameIndex}`}
