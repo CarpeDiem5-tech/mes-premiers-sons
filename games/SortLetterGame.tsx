@@ -12,8 +12,11 @@ interface Props {
   onComplete: (stars: number) => void;
 }
 
-const familyLabel = (family: LetterFamily) => family === 'vowel' ? 'voyelle' : 'consonne';
 const houseLabel = (family: LetterFamily) => family === 'vowel' ? 'voyelles' : 'consonnes';
+const successText = (letter: string, family: LetterFamily) =>
+  family === 'vowel'
+    ? `Bravo !\nLe ${letter} est bien arrivé dans la maison des voyelles.`
+    : `Super !\nLe ${letter} habite dans la maison des consonnes.`;
 
 export default function SortLetterGame({ game, onComplete }: Props) {
   const [selected, setSelected] = useState<LetterFamily | null>(null);
@@ -45,15 +48,15 @@ export default function SortLetterGame({ game, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <AudioInstruction text="Range la lettre dans la bonne maison." audio="sort_letter.mp3" />
+      <AudioInstruction text={`Où habite le ${game.letter.text} ?`} audio="sort_letter.mp3" />
       <LetterCard letter={game.letter} />
 
       {selected && (
         <View style={selected === game.letter.type ? styles.bravoBox : styles.hintBox}>
           <Text style={selected === game.letter.type ? styles.bravoText : styles.hintText}>
             {selected === game.letter.type
-              ? `Bravo ! ${game.letter.text} est une ${familyLabel(game.letter.type)}.`
-              : `Presque ! ${game.letter.text} va dans la maison des ${houseLabel(game.letter.type)}.`}
+              ? successText(game.letter.text, game.letter.type)
+              : `Regarde bien...\nEssaie encore.`}
           </Text>
         </View>
       )}
@@ -65,6 +68,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
           isSelected={selected === 'vowel'}
           isCorrect={selected === 'vowel' && game.letter.type === 'vowel'}
           isWrong={selected === 'vowel' && game.letter.type !== 'vowel'}
+          isHinted={selected !== null && game.letter.type === 'vowel' && selected !== 'vowel'}
         />
         <LetterFamilyHouse
           family="consonant"
@@ -72,6 +76,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
           isSelected={selected === 'consonant'}
           isCorrect={selected === 'consonant' && game.letter.type === 'consonant'}
           isWrong={selected === 'consonant' && game.letter.type !== 'consonant'}
+          isHinted={selected !== null && game.letter.type === 'consonant' && selected !== 'consonant'}
         />
       </View>
     </View>
