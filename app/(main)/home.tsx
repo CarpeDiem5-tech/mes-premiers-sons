@@ -17,16 +17,6 @@ import { getProgress } from '../../storage/progress';
 import { getLevelById, TOTAL_LEVELS } from '../../data/levels';
 import { ChildProfile, ChildProgress } from '../../types';
 
-function formatDate(iso: string | null): string {
-  if (!iso) return 'Jamais';
-  const d = new Date(iso);
-  const today = new Date();
-  const diff = Math.floor((today.getTime() - d.getTime()) / 86400000);
-  if (diff === 0) return "Aujourd'hui";
-  if (diff === 1) return 'Hier';
-  return `Il y a ${diff} jours`;
-}
-
 export default function HomeScreen() {
   const [profile, setProfile] = useState<ChildProfile | null>(null);
   const [progress, setProgress] = useState<ChildProgress | null>(null);
@@ -49,6 +39,7 @@ export default function HomeScreen() {
   if (!profile || !progress) return null;
 
   const level = getLevelById(progress.currentLevel);
+  const lastMissionLevel = getLevelById(progress.lastMissionLevelId);
   if (!level) return null;
 
   const missionsDoneThisLevel = progress.completedMissionIds.filter((id) =>
@@ -61,8 +52,8 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Bonjour !</Text>
-            <Text style={styles.name}>{profile.avatar} {profile.name}</Text>
+            <Text style={styles.greeting}>Bonjour {profile.name}</Text>
+            <Text style={styles.name}>{profile.avatar} Mission du jour</Text>
           </View>
           <StarCounter count={progress.totalStars} size="md" />
         </View>
@@ -87,8 +78,8 @@ export default function HomeScreen() {
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statEmoji}>🕐</Text>
-            <Text style={styles.statValue}>{formatDate(progress.lastMissionDate)}</Text>
-            <Text style={styles.statLabel}>Dernière fois</Text>
+            <Text style={styles.statValue}>{progress.lastMissionDate ? lastMissionLevel?.title ?? 'Mission' : 'Aucune'}</Text>
+            <Text style={styles.statLabel}>Dernière mission</Text>
           </View>
         </View>
 
