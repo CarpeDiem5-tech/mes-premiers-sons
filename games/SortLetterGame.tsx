@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import LetterCard from '../components/LetterCard';
 import LetterFamilyHouse from '../components/LetterFamilyHouse';
 import { SortLetterGame as SortLetterGameType, LetterFamily } from '../types';
@@ -18,9 +19,6 @@ export default function SortLetterGame({ game, onComplete }: Props) {
   const [selected, setSelected] = useState<LetterFamily | null>(null);
   const [done, setDone] = useState(false);
 
-  useEffect(() => {
-    Speech.speak(`Range ${game.letter.text} dans la bonne maison`, { language: 'fr-FR', rate: 0.82 });
-  }, [game.letter.text]);
 
   const handleSelect = (family: LetterFamily) => {
     if (done) return;
@@ -39,7 +37,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.instruction}>Range la lettre dans la bonne maison.</Text>
+      <AudioInstruction text="Range la lettre dans la bonne maison." audio="sort_letter.mp3" />
       <LetterCard letter={game.letter} />
 
       {selected && (

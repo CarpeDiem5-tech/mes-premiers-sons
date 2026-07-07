@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import LetterCard from '../components/LetterCard';
 import { ObserveLettersGame } from '../types';
 import { COLORS, FONT, SPACING } from '../utils/theme';
@@ -17,9 +17,6 @@ export default function ObserveLettersGameView({ game, onComplete }: Props) {
   const current = game.examples[index];
   const isLast = index === game.examples.length - 1;
 
-  useEffect(() => {
-    Speech.speak(`${current.text} est ${familyLabel(current.type)}.`, { language: 'fr-FR', rate: 0.82 });
-  }, [current]);
 
   const handleNext = () => {
     if (isLast) {
@@ -31,7 +28,7 @@ export default function ObserveLettersGameView({ game, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.instruction}>Observe la lettre.</Text>
+      <AudioInstruction text={`Observe la lettre. ${current.text} est ${familyLabel(current.type)}.`} audio="observe_letter.mp3" />
       <LetterCard letter={current} />
       <Text style={styles.sentence}>{current.text} est {familyLabel(current.type)}.</Text>
       <TouchableOpacity style={styles.button} onPress={handleNext} activeOpacity={0.86}>

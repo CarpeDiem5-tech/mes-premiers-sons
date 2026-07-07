@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import { ReadCardGame } from '../types';
 import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
 
@@ -51,6 +52,8 @@ export default function ReadCardGameView({ game, levelColor, onComplete }: Props
           />
         ))}
       </View>
+
+      <AudioInstruction text={`Écoute puis lis : ${current}.`} audio="read_card.mp3" />
 
       <View style={[styles.card, { borderColor: levelColor }]}>
         <Text style={[styles.cardText, { color: levelColor }]}>{current}</Text>

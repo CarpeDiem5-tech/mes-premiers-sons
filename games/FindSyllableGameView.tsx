@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import { FindSyllableGame } from '../types';
 import SyllableCard from '../components/SyllableCard';
 import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
@@ -23,7 +24,6 @@ export default function FindSyllableGameView({ game, levelColor, onComplete }: P
       Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
       Animated.spring(scaleAnim, { toValue: 1, friction: 6, useNativeDriver: true }),
     ]).start();
-    Speech.speak(`Trouve ${game.target}`, { language: 'fr-FR', rate: 0.8 });
   }, []);
 
   const handleSelect = (choice: string) => {
@@ -44,7 +44,7 @@ export default function FindSyllableGameView({ game, levelColor, onComplete }: P
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
       <View style={styles.targetBox}>
-        <Text style={styles.instruction}>Trouve</Text>
+        <AudioInstruction text={`Trouve ${game.target}.`} audio="find_syllable.mp3" />
         <Text style={[styles.target, { color: levelColor }]}>{game.target}</Text>
       </View>
 
