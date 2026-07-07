@@ -63,6 +63,12 @@ export interface LetterFamilyMemoryGame {
   cards: LetterItem[];
 }
 
+export interface SyllableItem {
+  id: string;
+  text: string;
+  audioText: string;
+}
+
 export interface FindSyllableGame {
   type: 'find_syllable';
   target: string;
@@ -76,7 +82,7 @@ export interface ReadCardGame {
 
 export interface MemoryGame {
   type: 'memory';
-  cards: string[];
+  cards: SyllableItem[];
 }
 
 export type Game =

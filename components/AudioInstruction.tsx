@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Speech from 'expo-speech';
 import { COLORS, FONT, RADIUS, SPACING } from '../utils/theme';
+import AudioService from '../services/AudioService';
 
 interface Props {
   text: string;
@@ -16,7 +16,7 @@ export default function AudioInstruction({ text, audio: _audio, autoPlay = true,
 
   const stopCurrent = useCallback(() => {
     playId.current += 1;
-    Speech.stop();
+    AudioService.stopCurrent();
     setIsPlaying(false);
   }, []);
 
@@ -24,21 +24,13 @@ export default function AudioInstruction({ text, audio: _audio, autoPlay = true,
     const currentPlay = playId.current + 1;
     playId.current = currentPlay;
 
-    Speech.stop();
     setIsPlaying(true);
-    Speech.speak(text, {
-      language: 'fr-FR',
-      rate,
-      onDone: () => {
-        if (playId.current === currentPlay) setIsPlaying(false);
-      },
-      onStopped: () => {
-        if (playId.current === currentPlay) setIsPlaying(false);
-      },
-      onError: () => {
-        if (playId.current === currentPlay) setIsPlaying(false);
-      },
-    });
+    AudioService.playInstruction(text);
+
+    const estimatedDuration = Math.max(1200, (text.length * 65) / rate);
+    setTimeout(() => {
+      if (playId.current === currentPlay) setIsPlaying(false);
+    }, estimatedDuration);
   }, [rate, text]);
 
   useEffect(() => {
