@@ -1,20 +1,14 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
-import { getActiveProfileId, getProfiles } from '../storage/profiles';
+import { getActiveProfile } from '../storage/profiles';
 import { View, ActivityIndicator } from 'react-native';
 import { COLORS } from '../utils/theme';
 
 export default function IndexScreen() {
   useEffect(() => {
     (async () => {
-      const id = await getActiveProfileId();
-      if (!id) { router.replace('/(onboarding)'); return; }
-      const profiles = await getProfiles();
-      if (!profiles.find((p) => p.id === id)) {
-        router.replace('/(onboarding)');
-      } else {
-        router.replace('/(main)/home');
-      }
+      const profile = await getActiveProfile();
+      router.replace(profile ? '/(main)/home' : '/(onboarding)');
     })();
   }, []);
 
