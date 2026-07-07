@@ -10,6 +10,8 @@ interface Props {
   isCorrect?: boolean;
   isWrong?: boolean;
   isHinted?: boolean;
+  showTitle?: boolean;
+  showLetters?: boolean;
 }
 
 const FAMILY_INFO = {
@@ -27,7 +29,16 @@ const FAMILY_INFO = {
   },
 };
 
-export default function LetterFamilyHouse({ family, onPress, isSelected, isCorrect, isWrong, isHinted }: Props) {
+export default function LetterFamilyHouse({
+  family,
+  onPress,
+  isSelected,
+  isCorrect,
+  isWrong,
+  isHinted,
+  showTitle = true,
+  showLetters = true,
+}: Props) {
   const info = FAMILY_INFO[family];
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -66,8 +77,8 @@ export default function LetterFamilyHouse({ family, onPress, isSelected, isCorre
       ]}
     >
       <Text style={styles.icon}>{info.icon}</Text>
-      <Text style={[styles.title, { color: info.color }]}>{info.title}</Text>
-      <Text style={styles.letters}>{info.letters}</Text>
+      {showTitle ? <Text style={[styles.title, { color: info.color }]}>{info.title}</Text> : null}
+      {showLetters ? <Text style={styles.letters}>{info.letters}</Text> : null}
     </Animated.View>
   );
 
@@ -81,9 +92,10 @@ export default function LetterFamilyHouse({ family, onPress, isSelected, isCorre
 }
 
 const styles = StyleSheet.create({
-  touchable: { width: '100%' },
+  touchable: { flex: 1, minWidth: 0 },
   house: {
     flex: 1,
+    width: '100%',
     minHeight: 180,
     borderRadius: RADIUS.xl,
     borderWidth: 4,

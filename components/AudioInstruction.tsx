@@ -8,9 +8,20 @@ interface Props {
   audio?: string;
   autoPlay?: boolean;
   rate?: number;
+  showText?: boolean;
+  showStatus?: boolean;
 }
 
-export default function AudioInstruction({ text, audio: _audio, autoPlay = true, rate = 0.82 }: Props) {
+// UX rule: audio instructions for non-reading children stay oral-only.
+// Only pass showText when the displayed text is itself the learning object.
+export default function AudioInstruction({
+  text,
+  audio: _audio,
+  autoPlay = true,
+  rate = 0.82,
+  showText = false,
+  showStatus = false,
+}: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const playId = useRef(0);
 
@@ -40,7 +51,7 @@ export default function AudioInstruction({ text, audio: _audio, autoPlay = true,
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{text}</Text>
+      {showText ? <Text style={styles.text}>{text}</Text> : null}
       <TouchableOpacity
         style={[styles.button, isPlaying && styles.buttonPlaying]}
         onPress={play}
@@ -49,9 +60,9 @@ export default function AudioInstruction({ text, audio: _audio, autoPlay = true,
         accessibilityLabel={`Réécouter la consigne : ${text}`}
       >
         <Text style={styles.icon}>🔊</Text>
-        <Text style={styles.buttonText}>{isPlaying ? 'Lecture...' : 'Réécouter'}</Text>
+        <Text style={styles.buttonText}>Réécouter</Text>
       </TouchableOpacity>
-      {isPlaying ? <Text style={styles.indicator}>● Consigne en cours</Text> : null}
+      {showStatus && isPlaying ? <Text style={styles.indicator}>● Consigne en cours</Text> : null}
     </View>
   );
 }

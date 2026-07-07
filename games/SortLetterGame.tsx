@@ -13,6 +13,7 @@ interface Props {
 }
 
 const houseLabel = (family: LetterFamily) => family === 'vowel' ? 'voyelles' : 'consonnes';
+const familyLabel = (family: LetterFamily) => family === 'vowel' ? 'voyelle' : 'consonne';
 const successText = (letter: string, family: LetterFamily) =>
   family === 'vowel'
     ? `Bravo !\nLe ${letter} est bien arrivé dans la maison des voyelles.`
