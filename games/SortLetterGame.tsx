@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
 import AudioInstruction from '../components/AudioInstruction';
@@ -18,7 +18,15 @@ const houseLabel = (family: LetterFamily) => family === 'vowel' ? 'voyelles' : '
 export default function SortLetterGame({ game, onComplete }: Props) {
   const [selected, setSelected] = useState<LetterFamily | null>(null);
   const [done, setDone] = useState(false);
+  const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    Speech.speak(`Range ${game.letter.text} dans la bonne maison`, { language: 'fr-FR', rate: 0.82 });
+
+    return () => {
+      if (completionTimer.current) clearTimeout(completionTimer.current);
+    };
+  }, [game.letter.text]);
 
   const handleSelect = (family: LetterFamily) => {
     if (done) return;
@@ -27,7 +35,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
     if (correct) {
       setDone(true);
       Speech.speak(`Bravo ! ${game.letter.text} est une ${familyLabel(game.letter.type)}.`, { language: 'fr-FR' });
-      setTimeout(() => onComplete(3), 1300);
+      completionTimer.current = setTimeout(() => onComplete(3), 1300);
       return;
     }
 
@@ -73,7 +81,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', paddingTop: SPACING.md },
   instruction: { fontFamily: FONT.extraBold, fontSize: 22, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
-  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', marginTop: SPACING.lg },
+  houses: { gap: SPACING.md, width: '100%', maxWidth: 460, marginTop: SPACING.lg },
   bravoBox: { backgroundColor: '#E8FBF5', borderRadius: RADIUS.xl, padding: SPACING.md, marginTop: SPACING.sm },
   hintBox: { backgroundColor: '#FFF8E8', borderRadius: RADIUS.xl, padding: SPACING.md, marginTop: SPACING.sm },
   bravoText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.success, textAlign: 'center' },

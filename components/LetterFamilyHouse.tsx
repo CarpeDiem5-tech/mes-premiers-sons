@@ -54,7 +54,7 @@ export default function LetterFamilyHouse({ family, onPress, isSelected, isCorre
 }
 
 const styles = StyleSheet.create({
-  touchable: { flex: 1 },
+  touchable: { width: '100%' },
   house: {
     flex: 1,
     minHeight: 180,
