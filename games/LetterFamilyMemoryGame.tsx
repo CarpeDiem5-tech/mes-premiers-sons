@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioService from '../services/AudioService';
 import { LetterFamilyMemoryGame as LetterFamilyMemoryGameType, LetterItem } from '../types';
 import { CONSONANT_COLOR, VOWEL_COLOR } from '../data/letters';
 import { COLORS, FONT, RADIUS, SPACING } from '../utils/theme';
@@ -37,12 +37,12 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
   const allDone = cards.every((card) => card.isMatched);
 
   useEffect(() => {
-    Speech.speak('Trouve deux lettres de la même famille.', { language: 'fr-FR', rate: 0.82 });
+    AudioService.playInstruction('Trouve deux lettres de la même famille.');
   }, []);
 
   useEffect(() => {
     if (allDone) {
-      Speech.speak('Super ! Les familles sont ensemble !', { language: 'fr-FR' });
+      AudioService.playFeedback('Super ! Les familles sont ensemble !');
       setTimeout(() => onComplete(moves <= 4 ? 3 : moves <= 6 ? 2 : 1), 1000);
     }
   }, [allDone]);
@@ -66,7 +66,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
       const second = newCards.find((item) => item.id === secondId)!;
 
       if (first.letter.type === second.letter.type) {
-        Speech.speak('Oui, même famille !', { language: 'fr-FR' });
+        AudioService.playFeedback('Oui, même famille !');
         setTimeout(() => {
           setCards((previous) => previous.map((item) =>
             item.id === firstId || item.id === secondId ? { ...item, isMatched: true } : item
@@ -75,7 +75,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
           setLocked(false);
         }, 700);
       } else {
-        Speech.speak('Presque ! On continue.', { language: 'fr-FR' });
+        AudioService.playFeedback('Presque ! On continue.');
         setTimeout(() => {
           setCards((previous) => previous.map((item) =>
             item.id === firstId || item.id === secondId ? { ...item, isFlipped: false } : item

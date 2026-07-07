@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as Speech from 'expo-speech';
+import AudioService from '../services/AudioService';
 import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
 import GameLayout from '../components/GameLayout';
 import LetterFamilyIntroGameView from '../games/LetterFamilyIntroGameView';
@@ -57,7 +57,7 @@ export default function MissionScreen() {
     if (id) {
       await recordMissionComplete(id, mission.id, stars);
     }
-    Speech.speak('Mission accomplie !', { language: 'fr-FR' });
+    AudioService.playFeedback('Mission accomplie !');
   };
 
   if (phase === 'ready') {

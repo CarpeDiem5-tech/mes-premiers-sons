@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioService from '../services/AudioService';
 import AudioInstruction from '../components/AudioInstruction';
 import { FindSyllableGame } from '../types';
 import SyllableCard from '../components/SyllableCard';
@@ -32,11 +32,11 @@ export default function FindSyllableGameView({ game, levelColor, onComplete }: P
     const correct = choice === game.target;
     if (correct) {
       setDone(true);
-      Speech.speak('Bravo !', { language: 'fr-FR' });
+      AudioService.playFeedback('Bravo !');
       setTimeout(() => onComplete(attempts === 0 ? 3 : attempts === 1 ? 2 : 1), 1200);
     } else {
       setAttempts((a) => a + 1);
-      Speech.speak('Essaie encore !', { language: 'fr-FR' });
+      AudioService.playFeedback('Essaie encore !');
       setTimeout(() => setSelected(null), 900);
     }
   };
