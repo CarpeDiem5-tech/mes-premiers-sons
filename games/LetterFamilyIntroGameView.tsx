@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import LetterFamilyHouse from '../components/LetterFamilyHouse';
 import { COLORS, FONT, SPACING } from '../utils/theme';
 
@@ -9,14 +9,10 @@ interface Props {
 }
 
 export default function LetterFamilyIntroGameView({ onComplete }: Props) {
-  useEffect(() => {
-    Speech.speak('Il y a deux familles de lettres.', { language: 'fr-FR', rate: 0.82 });
-  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Deux familles de lettres</Text>
-      <Text style={styles.subtitle}>Regarde les deux maisons.</Text>
+      <AudioInstruction text="Il y a deux familles de lettres. Regarde les deux maisons." audio="letter_families.mp3" />
       <View style={styles.houses}>
         <LetterFamilyHouse family="vowel" />
         <LetterFamilyHouse family="consonant" />

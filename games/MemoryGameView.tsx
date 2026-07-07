@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import { MemoryGame } from '../types';
 import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
 
@@ -88,7 +89,7 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
 
   return (
     <View style={styles.container}>
-      <Text style={styles.info}>Trouve les paires !</Text>
+      <AudioInstruction text="Trouve les paires !" audio="find_pairs.mp3" />
       <View style={styles.grid}>
         {cards.map((card) => (
           <TouchableOpacity

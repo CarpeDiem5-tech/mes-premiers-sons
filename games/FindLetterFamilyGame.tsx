@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Speech from 'expo-speech';
+import AudioInstruction from '../components/AudioInstruction';
 import LetterCard from '../components/LetterCard';
 import { LetterFamily, LetterItem } from '../types';
 import { COLORS, FONT, RADIUS, SPACING } from '../utils/theme';
@@ -18,9 +19,6 @@ export default function FindLetterFamilyGame({ choices, targetFamily, onComplete
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  useEffect(() => {
-    Speech.speak(`Trouve ${targetText(targetFamily)}`, { language: 'fr-FR', rate: 0.82 });
-  }, [targetFamily]);
 
   const handleSelect = (letter: LetterItem) => {
     if (done) return;
@@ -38,7 +36,7 @@ export default function FindLetterFamilyGame({ choices, targetFamily, onComplete
 
   return (
     <View style={styles.container}>
-      <Text style={styles.instruction}>Trouve {targetText(targetFamily)}.</Text>
+      <AudioInstruction text={`Trouve ${targetText(targetFamily)}.`} audio={`${targetFamily}_instruction.mp3`} />
       {selectedId && (
         <View style={done ? styles.bravoBox : styles.hintBox}>
           <Text style={done ? styles.bravoText : styles.hintText}>
