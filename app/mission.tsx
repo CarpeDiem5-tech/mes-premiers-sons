@@ -128,12 +128,21 @@ export default function MissionScreen() {
     );
   }
 
+  if (currentGame.type === 'letter_family_intro') {
+    return (
+      <SafeAreaView style={styles.introSafe}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.introBackBtn} activeOpacity={0.7}>
+          <Text style={styles.introBackIcon}>✕</Text>
+        </TouchableOpacity>
+        <LetterFamilyIntroGameView key={`intro-${gameIndex}`} onComplete={handleGameComplete} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <GameLayout
       title={
-        currentGame.type === 'letter_family_intro'
-          ? '🏡 Les maisons des lettres'
-          : currentGame.type === 'observe_letters'
+        currentGame.type === 'observe_letters'
           ? 'Observe !'
           : currentGame.type === 'sort_letter'
           ? 'Où habite la lettre ?'
@@ -154,12 +163,6 @@ export default function MissionScreen() {
       levelColor={level.color}
       onBack={() => router.back()}
     >
-      {currentGame.type === 'letter_family_intro' && (
-        <LetterFamilyIntroGameView
-          key={`intro-${gameIndex}`}
-          onComplete={handleGameComplete}
-        />
-      )}
       {currentGame.type === 'observe_letters' && (
         <ObserveLettersGameView
           key={`observe-${gameIndex}`}
@@ -224,6 +227,29 @@ export default function MissionScreen() {
 }
 
 const styles = StyleSheet.create({
+  introSafe: { flex: 1, backgroundColor: COLORS.background },
+  introBackBtn: {
+    position: 'absolute',
+    top: SPACING.lg,
+    left: SPACING.lg,
+    zIndex: 1,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  introBackIcon: {
+    fontSize: 16,
+    color: COLORS.textLight,
+    fontFamily: FONT.bold,
+  },
   readySafe: { flex: 1, backgroundColor: COLORS.background },
   readyContainer: {
     flex: 1,

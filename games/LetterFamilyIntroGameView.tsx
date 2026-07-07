@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Text, StyleSheet, TouchableOpacity, View } from 'react-native';
-import AudioInstruction from '../components/AudioInstruction';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LetterFamilyHouse from '../components/LetterFamilyHouse';
+import AudioService from '../services/AudioService';
 import { COLORS, FONT, RADIUS, SPACING } from '../utils/theme';
+import { LetterFamily } from '../types';
 
 interface Props {
   onComplete: (stars: number) => void;
@@ -13,78 +14,110 @@ const narration = [
   'Regarde ces deux maisons.',
   'Dans cette maison habitent les voyelles.',
   'Et dans cette maison habitent les consonnes.',
-  'Maintenant, allons jouer avec les lettres !',
+  'Maintenant...',
+  'On va jouer !',
 ].join('\n\n');
 
-const sentences = [
-  'Regarde !',
-  'Les lettres ont deux maisons.',
-  'Les voyelles habitent ici.',
-  'Les consonnes habitent là.',
+const narrationCues: Array<{ family: LetterFamily; delay: number; duration: number }> = [
+  { family: 'vowel', delay: 4200, duration: 1700 },
+  { family: 'consonant', delay: 6500, duration: 1900 },
 ];
 
 export default function LetterFamilyIntroGameView({ onComplete }: Props) {
-  const fadeValues = useRef(sentences.map(() => new Animated.Value(0))).current;
-  const translateValues = useRef(sentences.map(() => new Animated.Value(8))).current;
+  const [highlightedFamily, setHighlightedFamily] = useState<LetterFamily | null>(null);
+  const cueTimers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+
+  const clearCues = useCallback(() => {
+    cueTimers.current.forEach(clearTimeout);
+    cueTimers.current = [];
+    setHighlightedFamily(null);
+  }, []);
+
+  const playNarration = useCallback(() => {
+    clearCues();
+    AudioService.playInstruction(narration);
+
+    narrationCues.forEach(({ family, delay, duration }) => {
+      cueTimers.current.push(
+        setTimeout(() => {
+          setHighlightedFamily(family);
+          cueTimers.current.push(
+            setTimeout(() => setHighlightedFamily((current) => (current === family ? null : current)), duration),
+          );
+        }, delay),
+      );
+    });
+  }, [clearCues]);
 
   useEffect(() => {
-    const animations = sentences.map((_, index) =>
-      Animated.parallel([
-        Animated.timing(fadeValues[index], {
-          toValue: 1,
-          duration: 420,
-          delay: index * 850,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateValues[index], {
-          toValue: 0,
-          duration: 420,
-          delay: index * 850,
-          useNativeDriver: true,
-        }),
-      ])
-    );
+    playNarration();
 
-    Animated.stagger(120, animations).start();
-  }, [fadeValues, translateValues]);
+    return () => {
+      clearCues();
+      AudioService.stopCurrent();
+    };
+  }, [clearCues, playNarration]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🏡 Les maisons des lettres</Text>
-      <AudioInstruction text={narration} audio="letter_houses.mp3" />
-      <View style={styles.sentences}>
-        {sentences.map((sentence, index) => (
-          <Animated.Text
-            key={sentence}
-            style={[
-              styles.sentence,
-              {
-                opacity: fadeValues[index],
-                transform: [{ translateY: translateValues[index] }],
-              },
-            ]}
-          >
-            {sentence}
-          </Animated.Text>
-        ))}
-      </View>
+
       <View style={styles.houses}>
-        <LetterFamilyHouse family="vowel" />
-        <LetterFamilyHouse family="consonant" />
+        <View style={styles.houseColumn}>
+          <LetterFamilyHouse
+            family="vowel"
+            isHinted={highlightedFamily === 'vowel'}
+            showTitle={false}
+            showLetters={false}
+          />
+          <Text style={styles.houseLabel}>Maison des voyelles</Text>
+        </View>
+        <View style={styles.houseColumn}>
+          <LetterFamilyHouse
+            family="consonant"
+            isHinted={highlightedFamily === 'consonant'}
+            showTitle={false}
+            showLetters={false}
+          />
+          <Text style={styles.houseLabel}>Maison des consonnes</Text>
+        </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.replayButton}
+        onPress={playNarration}
+        activeOpacity={0.78}
+        accessibilityRole="button"
+        accessibilityLabel="Réécouter la narration"
+      >
+        <Text style={styles.replayText}>🔊 Réécouter</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => onComplete(3)} activeOpacity={0.86}>
-        <Text style={styles.buttonText}>On joue !</Text>
+        <Text style={styles.buttonText}>🟠 On joue !</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', paddingTop: SPACING.md },
-  title: { fontFamily: FONT.extraBold, fontSize: 26, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
-  sentences: { width: '100%', backgroundColor: COLORS.card, borderRadius: RADIUS.xl, padding: SPACING.md, marginBottom: SPACING.md, gap: SPACING.xs },
-  sentence: { fontFamily: FONT.bold, fontSize: 18, color: COLORS.text, textAlign: 'center', lineHeight: 24 },
-  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 560, marginBottom: SPACING.xl },
-  button: { backgroundColor: COLORS.primary, borderRadius: 999, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: SPACING.lg, gap: SPACING.lg },
+  title: { fontFamily: FONT.extraBold, fontSize: 26, color: COLORS.text, textAlign: 'center' },
+  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 560 },
+  houseColumn: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACING.sm },
+  houseLabel: { fontFamily: FONT.extraBold, fontSize: 17, color: COLORS.text, textAlign: 'center' },
+  replayButton: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.card,
+  },
+  replayText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.primary },
+  button: {
+    backgroundColor: COLORS.secondary,
+    borderRadius: 999,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+  },
   buttonText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.textWhite },
 });
