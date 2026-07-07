@@ -33,7 +33,11 @@ export async function deleteProfile(id: string): Promise<void> {
 }
 
 export async function getActiveProfileId(): Promise<string | null> {
-  return AsyncStorage.getItem(ACTIVE_PROFILE_KEY);
+  try {
+    return await AsyncStorage.getItem(ACTIVE_PROFILE_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export async function setActiveProfileId(id: string): Promise<void> {
