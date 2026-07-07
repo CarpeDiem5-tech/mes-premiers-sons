@@ -16,14 +16,10 @@ const webStorage: StorageAdapter = {
     }
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      localStorage.setItem(key, value);
-    } catch {}
+    localStorage.setItem(key, value);
   },
   removeItem: async (key: string): Promise<void> => {
-    try {
-      localStorage.removeItem(key);
-    } catch {}
+    localStorage.removeItem(key);
   },
 };
 
@@ -36,14 +32,10 @@ const nativeStorage: StorageAdapter = {
     }
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      await RNAsyncStorage.setItem(key, value);
-    } catch {}
+    await RNAsyncStorage.setItem(key, value);
   },
   removeItem: async (key: string): Promise<void> => {
-    try {
-      await RNAsyncStorage.removeItem(key);
-    } catch {}
+    await RNAsyncStorage.removeItem(key);
   },
 };
 

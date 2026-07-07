@@ -12,7 +12,7 @@ import { COLORS, FONT, SPACING, RADIUS } from '../../utils/theme';
 import MissionCard from '../../components/MissionCard';
 import StarCounter from '../../components/StarCounter';
 import ProgressBar from '../../components/ProgressBar';
-import { getActiveProfileId, getProfiles } from '../../storage/profiles';
+import { getActiveProfile } from '../../storage/profiles';
 import { getProgress } from '../../storage/progress';
 import { getLevelById, TOTAL_LEVELS } from '../../data/levels';
 import { ChildProfile, ChildProgress } from '../../types';
@@ -24,13 +24,10 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       (async () => {
-        const id = await getActiveProfileId();
-        if (!id) { router.replace('/(onboarding)'); return; }
-        const profiles = await getProfiles();
-        const p = profiles.find((x) => x.id === id);
+        const p = await getActiveProfile();
         if (!p) { router.replace('/(onboarding)'); return; }
         setProfile(p);
-        const prog = await getProgress(id);
+        const prog = await getProgress(p.id);
         setProgress(prog);
       })();
     }, [])
