@@ -3,8 +3,8 @@ import { Level } from '../types';
 export const LEVELS: Level[] = [
   {
     id: 1,
-    title: 'Les deux familles de lettres',
-    description: 'Découvre les voyelles et les consonnes',
+    title: 'Les maisons des lettres',
+    description: 'Joue avec les deux maisons',
     color: '#FF6B6B',
     icon: '🏠',
     items: ['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z'],

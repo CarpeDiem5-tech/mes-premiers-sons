@@ -22,7 +22,7 @@ export default function LetterCard({ letter, onPress, size = 'lg', isCorrect, is
       style={[
         styles.card,
         { width: cardSize, height: cardSize, borderColor: color, backgroundColor: `${color}18` },
-        isCorrect && styles.correct,
+        isCorrect && { backgroundColor: `${color}28`, shadowColor: color },
         isWrong && styles.wrong,
       ]}
     >
@@ -56,12 +56,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.extraBold,
     textAlign: 'center',
   },
-  correct: {
-    backgroundColor: '#E8FBF5',
-    borderColor: COLORS.success,
-  },
   wrong: {
-    backgroundColor: '#FFF8E8',
-    borderColor: COLORS.warning,
+    opacity: 0.72,
   },
 });

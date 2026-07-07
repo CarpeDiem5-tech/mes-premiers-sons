@@ -37,12 +37,12 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
   const allDone = cards.every((card) => card.isMatched);
 
   useEffect(() => {
-    Speech.speak('Trouve deux lettres de la même famille.', { language: 'fr-FR', rate: 0.82 });
+    Speech.speak('Trouve deux lettres de la même maison.', { language: 'fr-FR', rate: 0.82 });
   }, []);
 
   useEffect(() => {
     if (allDone) {
-      Speech.speak('Super ! Les familles sont ensemble !', { language: 'fr-FR' });
+      Speech.speak('Super ! Les lettres sont dans la même maison !', { language: 'fr-FR' });
       setTimeout(() => onComplete(moves <= 4 ? 3 : moves <= 6 ? 2 : 1), 1000);
     }
   }, [allDone]);
@@ -66,7 +66,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
       const second = newCards.find((item) => item.id === secondId)!;
 
       if (first.letter.type === second.letter.type) {
-        Speech.speak('Oui, même famille !', { language: 'fr-FR' });
+        Speech.speak('Oui, même maison !', { language: 'fr-FR' });
         setTimeout(() => {
           setCards((previous) => previous.map((item) =>
             item.id === firstId || item.id === secondId ? { ...item, isMatched: true } : item
@@ -75,7 +75,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
           setLocked(false);
         }, 700);
       } else {
-        Speech.speak('Presque ! On continue.', { language: 'fr-FR' });
+        Speech.speak('Regarde bien. Tu vas y arriver.', { language: 'fr-FR' });
         setTimeout(() => {
           setCards((previous) => previous.map((item) =>
             item.id === firstId || item.id === secondId ? { ...item, isFlipped: false } : item
@@ -89,7 +89,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.instruction}>Trouve deux lettres de la même famille.</Text>
+      <Text style={styles.instruction}>Trouve deux lettres de la même maison.</Text>
       <View style={styles.grid}>
         {cards.map((card) => {
           const color = card.letter.type === 'vowel' ? VOWEL_COLOR : CONSONANT_COLOR;
@@ -101,7 +101,7 @@ export default function LetterFamilyMemoryGame({ game, onComplete }: Props) {
                 card.isFlipped || card.isMatched
                   ? { borderColor: color, backgroundColor: `${color}18` }
                   : styles.cardBack,
-                card.isMatched && styles.matched,
+                card.isMatched && { backgroundColor: `${color}28`, borderColor: color },
               ]}
               onPress={() => flipCard(card.id)}
               activeOpacity={0.82}
@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   cardBack: { backgroundColor: '#F0EDE8', borderColor: COLORS.border },
-  matched: { backgroundColor: '#E8FBF5', borderColor: COLORS.success },
   cardText: { fontFamily: FONT.extraBold, fontSize: 42 },
   cardBackText: { fontFamily: FONT.extraBold, fontSize: 34, color: COLORS.textLight },
   bravoBox: { marginTop: SPACING.xl, backgroundColor: '#E8FBF5', borderRadius: RADIUS.xl, padding: SPACING.md },
