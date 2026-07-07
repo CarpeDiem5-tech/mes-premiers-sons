@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: FONT.extraBold, fontSize: 26, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
   sentences: { width: '100%', backgroundColor: COLORS.card, borderRadius: RADIUS.xl, padding: SPACING.md, marginBottom: SPACING.md, gap: SPACING.xs },
   sentence: { fontFamily: FONT.bold, fontSize: 18, color: COLORS.text, textAlign: 'center', lineHeight: 24 },
-  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', marginBottom: SPACING.xl },
+  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 560, marginBottom: SPACING.xl },
   button: { backgroundColor: COLORS.primary, borderRadius: 999, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md },
   buttonText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.textWhite },
 });
