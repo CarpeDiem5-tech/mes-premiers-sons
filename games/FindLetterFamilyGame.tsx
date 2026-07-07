@@ -12,8 +12,7 @@ interface Props {
   onComplete: (stars: number) => void;
 }
 
-const targetText = (family: LetterFamily) => family === 'vowel' ? 'la voyelle' : 'la consonne';
-const familyText = (family: LetterFamily) => family === 'vowel' ? 'une voyelle' : 'une consonne';
+const houseText = (family: LetterFamily) => family === 'vowel' ? 'la maison des voyelles' : 'la maison des consonnes';
 
 export default function FindLetterFamilyGame({ choices, targetFamily, onComplete }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -25,22 +24,22 @@ export default function FindLetterFamilyGame({ choices, targetFamily, onComplete
     setSelectedId(letter.id);
     if (letter.type === targetFamily) {
       setDone(true);
-      Speech.speak(`Bravo ! ${letter.text} est ${familyText(letter.type)}.`, { language: 'fr-FR' });
+      Speech.speak(`Bravo ! Le ${letter.text} habite dans ${houseText(letter.type)}.`, { language: 'fr-FR' });
       setTimeout(() => onComplete(3), 1200);
       return;
     }
 
-    Speech.speak('Presque ! Essaie encore.', { language: 'fr-FR' });
+    Speech.speak('Regarde bien. Essaie encore.', { language: 'fr-FR' });
     setTimeout(() => setSelectedId(null), 900);
   };
 
   return (
     <View style={styles.container}>
-      <AudioInstruction text={`Trouve ${targetText(targetFamily)}.`} audio={`${targetFamily}_instruction.mp3`} />
+      <AudioInstruction text={`Trouve une lettre pour ${houseText(targetFamily)}.`} audio={`${targetFamily}_instruction.mp3`} />
       {selectedId && (
         <View style={done ? styles.bravoBox : styles.hintBox}>
           <Text style={done ? styles.bravoText : styles.hintText}>
-            {done ? 'Bravo ! ⭐' : 'Presque ! Essaie encore.'}
+            {done ? 'Bravo ! ⭐' : 'Regarde bien... Essaie encore.'}
           </Text>
         </View>
       )}

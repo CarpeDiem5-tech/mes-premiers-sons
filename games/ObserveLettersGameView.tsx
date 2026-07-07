@@ -10,7 +10,7 @@ interface Props {
   onComplete: (stars: number) => void;
 }
 
-const familyLabel = (type: string) => type === 'vowel' ? 'une voyelle' : 'une consonne';
+const houseLabel = (type: string) => type === 'vowel' ? 'la maison des voyelles' : 'la maison des consonnes';
 
 export default function ObserveLettersGameView({ game, onComplete }: Props) {
   const [index, setIndex] = useState(0);
@@ -28,9 +28,9 @@ export default function ObserveLettersGameView({ game, onComplete }: Props) {
 
   return (
     <View style={styles.container}>
-      <AudioInstruction text={`Observe la lettre. ${current.text} est ${familyLabel(current.type)}.`} audio="observe_letter.mp3" />
+      <AudioInstruction text={`Regarde le ${current.text}. Il habite dans ${houseLabel(current.type)}.`} audio="observe_letter.mp3" />
       <LetterCard letter={current} />
-      <Text style={styles.sentence}>{current.text} est {familyLabel(current.type)}.</Text>
+      <Text style={styles.sentence}>Le {current.text} habite ici.</Text>
       <TouchableOpacity style={styles.button} onPress={handleNext} activeOpacity={0.86}>
         <Text style={styles.buttonText}>{isLast ? 'À toi de jouer !' : 'Encore une lettre'}</Text>
       </TouchableOpacity>
