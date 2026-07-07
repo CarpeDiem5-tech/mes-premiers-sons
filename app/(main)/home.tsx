@@ -56,7 +56,7 @@ export default function HomeScreen() {
         </View>
 
         <MissionCard
-          onPress={() => router.push({ pathname: '/(main)/mission', params: { levelId: String(progress.currentLevel) } })}
+          onPress={() => router.push({ pathname: '/mission', params: { levelId: String(progress.currentLevel) } })}
           levelTitle={level.title}
           levelIcon={level.icon}
           estimatedMinutes={5}

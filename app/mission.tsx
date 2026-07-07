@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
-import { COLORS, FONT, SPACING, RADIUS } from '../../utils/theme';
-import GameLayout from '../../components/GameLayout';
-import FindSyllableGameView from '../../games/FindSyllableGameView';
-import ReadCardGameView from '../../games/ReadCardGameView';
-import MemoryGameView from '../../games/MemoryGameView';
-import { generateMission } from '../../utils/generateMission';
-import { getLevelById } from '../../data/levels';
-import { getActiveProfileId } from '../../storage/profiles';
-import { recordMissionComplete } from '../../storage/progress';
-import { Mission } from '../../types';
+import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
+import GameLayout from '../components/GameLayout';
+import FindSyllableGameView from '../games/FindSyllableGameView';
+import ReadCardGameView from '../games/ReadCardGameView';
+import MemoryGameView from '../games/MemoryGameView';
+import { generateMission } from '../utils/generateMission';
+import { getLevelById } from '../data/levels';
+import { getActiveProfileId } from '../storage/profiles';
+import { recordMissionComplete } from '../storage/progress';
+import { Mission } from '../types';
 
 type Phase = 'ready' | 'playing' | 'complete';
 
