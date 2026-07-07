@@ -13,7 +13,7 @@ import {
 import { router } from 'expo-router';
 import { COLORS, FONT, SPACING, RADIUS } from '../../utils/theme';
 import AvatarPicker from '../../components/AvatarPicker';
-import { saveProfile, setActiveProfileId } from '../../storage/profiles';
+import { createProfile } from '../../storage/profiles';
 import { ChildProfile } from '../../types';
 
 const AGES = [3, 4, 5, 6];
@@ -23,12 +23,14 @@ export default function CreateProfileScreen() {
   const [age, setAge] = useState(4);
   const [avatar, setAvatar] = useState('🐝');
   const [error, setError] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleCreate = async () => {
     if (!name.trim()) {
       setError('Entre le prénom !');
       return;
     }
+    setIsCreating(true);
     const profile: ChildProfile = {
       id: Date.now().toString(),
       name: name.trim(),
@@ -36,9 +38,14 @@ export default function CreateProfileScreen() {
       avatar,
       createdAt: new Date().toISOString(),
     };
-    await saveProfile(profile);
-    await setActiveProfileId(profile.id);
-    router.replace('/(main)/home');
+    try {
+      await createProfile(profile);
+      router.replace('/(main)/home');
+    } catch {
+      setError("Impossible de créer le profil. Réessaie dans un instant.");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -87,8 +94,13 @@ export default function CreateProfileScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.createBtn} onPress={handleCreate} activeOpacity={0.88}>
-            <Text style={styles.createText}>C'est parti ! 🚀</Text>
+          <TouchableOpacity
+            style={[styles.createBtn, isCreating && styles.createBtnDisabled]}
+            onPress={handleCreate}
+            activeOpacity={0.88}
+            disabled={isCreating}
+          >
+            <Text style={styles.createText}>{isCreating ? 'Création...' : "C'est parti ! 🚀"}</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -141,5 +153,6 @@ const styles = StyleSheet.create({
     elevation: 6,
     marginTop: SPACING.md,
   },
+  createBtnDisabled: { opacity: 0.7 },
   createText: { fontFamily: FONT.extraBold, fontSize: 20, color: COLORS.textWhite },
 });
