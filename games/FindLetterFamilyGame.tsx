@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioService from '../services/AudioService';
 import AudioInstruction from '../components/AudioInstruction';
 import LetterCard from '../components/LetterCard';
 import { LetterFamily, LetterItem } from '../types';
@@ -24,12 +24,12 @@ export default function FindLetterFamilyGame({ choices, targetFamily, onComplete
     setSelectedId(letter.id);
     if (letter.type === targetFamily) {
       setDone(true);
-      Speech.speak(`Bravo ! Le ${letter.text} habite dans ${houseText(letter.type)}.`, { language: 'fr-FR' });
+      AudioService.playFeedback(`Bravo ! Le ${letter.text} habite dans ${houseText(letter.type)}.`);
       setTimeout(() => onComplete(3), 1200);
       return;
     }
 
-    Speech.speak('Regarde bien. Essaie encore.', { language: 'fr-FR' });
+    AudioService.playFeedback('Regarde bien. Essaie encore.');
     setTimeout(() => setSelectedId(null), 900);
   };
 
@@ -39,7 +39,7 @@ export default function FindLetterFamilyGame({ choices, targetFamily, onComplete
       {selectedId && (
         <View style={done ? styles.bravoBox : styles.hintBox}>
           <Text style={done ? styles.bravoText : styles.hintText}>
-            {done ? 'Bravo ! ⭐' : 'Regarde bien... Essaie encore.'}
+            {done ? 'Bravo ! ⭐' : 'Regarde bien. Essaie encore.'}
           </Text>
         </View>
       )}

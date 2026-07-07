@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioService from './AudioService';
 
 export interface SpeechRecognitionResult {
   transcript: string;
@@ -18,7 +18,6 @@ export interface CloseEnoughOptions {
 
 const DEFAULT_LANGUAGE = 'fr-FR';
 const DEFAULT_SIMILARITY_THRESHOLD = 0.68;
-const SYLLABLE_RATE = 0.72;
 
 type BrowserSpeechRecognition = {
   lang: string;
@@ -102,8 +101,8 @@ class SpeechService {
   playSyllable(text: string): void {
     const normalizedText = text.trim().toLowerCase();
     if (!normalizedText) return;
-    Speech.stop();
-    Speech.speak(normalizedText, { language: DEFAULT_LANGUAGE, rate: SYLLABLE_RATE });
+    AudioService.stopCurrent();
+    AudioService.playSyllable(normalizedText);
   }
 
   async startListening(): Promise<void> {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import * as Speech from 'expo-speech';
+import AudioService from '../services/AudioService';
 import AudioInstruction from '../components/AudioInstruction';
 import LetterCard from '../components/LetterCard';
 import LetterFamilyHouse from '../components/LetterFamilyHouse';
@@ -24,7 +24,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
   const completionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    Speech.speak(`Où habite le ${game.letter.text} ?`, { language: 'fr-FR', rate: 0.82 });
+    AudioService.playInstruction(`Range ${game.letter.text} dans la bonne maison.`);
 
     return () => {
       if (completionTimer.current) clearTimeout(completionTimer.current);
@@ -37,12 +37,12 @@ export default function SortLetterGame({ game, onComplete }: Props) {
     const correct = family === game.letter.type;
     if (correct) {
       setDone(true);
-      Speech.speak(successText(game.letter.text, game.letter.type), { language: 'fr-FR' });
+      AudioService.playFeedback(`Bravo ! ${game.letter.text} est une ${familyLabel(game.letter.type)}.`);
       completionTimer.current = setTimeout(() => onComplete(3), 1300);
       return;
     }
 
-    Speech.speak(`Regarde bien. Le ${game.letter.text} habite dans la maison des ${houseLabel(game.letter.type)}.`, { language: 'fr-FR' });
+    AudioService.playFeedback(`${game.letter.text} va dans la maison des ${houseLabel(game.letter.type)}.`);
     setTimeout(() => setSelected(null), 1100);
   };
 
