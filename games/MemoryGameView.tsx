@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import * as Speech from 'expo-speech';
 import AudioInstruction from '../components/AudioInstruction';
-import { MemoryGame } from '../types';
+import EncouragementBanner from '../components/EncouragementBanner';
+import { MemoryGame, SyllableItem } from '../types';
+import AudioService from '../services/AudioService';
 import { COLORS, FONT, SPACING, RADIUS } from '../utils/theme';
 
 interface CardState {
   id: number;
-  value: string;
+  value: SyllableItem;
   isFlipped: boolean;
   isMatched: boolean;
 }
@@ -34,6 +35,7 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [encouragement, setEncouragement] = useState<string | null>(null);
 
   const matchedCount = cards.filter((c) => c.isMatched).length;
   const totalPairs = cards.length / 2;
@@ -42,7 +44,7 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
   useEffect(() => {
     if (allDone) {
       const stars = moves <= totalPairs + 1 ? 3 : moves <= totalPairs + 3 ? 2 : 1;
-      Speech.speak('Excellent !', { language: 'fr-FR' });
+      AudioService.playInstruction('Excellent !');
       setTimeout(() => onComplete(stars), 1000);
     }
   }, [allDone]);
@@ -52,6 +54,9 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
     const card = cards.find((c) => c.id === id);
     if (!card || card.isFlipped || card.isMatched) return;
     if (selected.length === 1 && selected[0] === id) return;
+
+    setEncouragement(null);
+    AudioService.playSyllable(card.value.audioText);
 
     const newCards = cards.map((c) => (c.id === id ? { ...c, isFlipped: true } : c));
     setCards(newCards);
@@ -66,9 +71,9 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
       const cardA = newCards.find((c) => c.id === a)!;
       const cardB = newCards.find((c) => c.id === b)!;
 
-      if (cardA.value === cardB.value) {
-        Speech.speak('Oui !', { language: 'fr-FR' });
+      if (cardA.value.id === cardB.value.id) {
         setTimeout(() => {
+          setEncouragement('Oui !');
           setCards((prev) =>
             prev.map((c) => (c.id === a || c.id === b ? { ...c, isMatched: true } : c))
           );
@@ -90,6 +95,12 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
   return (
     <View style={styles.container}>
       <AudioInstruction text="Trouve les paires !" audio="find_pairs.mp3" />
+      <EncouragementBanner
+        message={encouragement}
+        visible={Boolean(encouragement)}
+        durationMs={1400}
+        onHide={() => setEncouragement(null)}
+      />
       <View style={styles.grid}>
         {cards.map((card) => (
           <TouchableOpacity
@@ -105,7 +116,7 @@ export default function MemoryGameView({ game, levelColor, onComplete }: Props) 
           >
             {card.isFlipped || card.isMatched ? (
               <Text style={[styles.cardText, { color: card.isMatched ? COLORS.success : levelColor }]}>
-                {card.value}
+                {card.value.text}
               </Text>
             ) : (
               <Text style={styles.cardBackText}>?</Text>

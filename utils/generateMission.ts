@@ -1,4 +1,4 @@
-import { Mission, Game, FindSyllableGame, ReadCardGame, MemoryGame } from '../types';
+import { Mission, Game, FindSyllableGame, ReadCardGame, MemoryGame, SyllableItem } from '../types';
 import { consonants, letters, vowels } from '../data/letters';
 import { getLevelById } from '../data/levels';
 
@@ -29,8 +29,16 @@ function buildReadCardGame(items: string[]): ReadCardGame {
   return { type: 'read_card', cards };
 }
 
+function toSyllableItem(text: string): SyllableItem {
+  return {
+    id: text.toLowerCase(),
+    text,
+    audioText: text.toLowerCase(),
+  };
+}
+
 function buildMemoryGame(items: string[]): MemoryGame {
-  const base = pickRandom(items, 3);
+  const base = pickRandom(items, 3).map(toSyllableItem);
   return { type: 'memory', cards: [...base, ...base] };
 }
 
