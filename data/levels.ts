@@ -70,7 +70,7 @@ export const LEVELS: Level[] = [
     description: 'Lis des petites phrases',
     color: '#E17055',
     icon: '✨',
-    items: ['Papa a lu.', 'Lili a ri.', 'Lama a soif.', 'Moto papi.'],
+    items: ['Papa a lu.', 'Lili a ri.'],
     type: 'sentences',
   },
 ];

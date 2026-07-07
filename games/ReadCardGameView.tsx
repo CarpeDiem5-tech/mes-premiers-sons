@@ -12,20 +12,28 @@ interface Props {
 
 export default function ReadCardGameView({ game, levelColor, onComplete }: Props) {
   const [index, setIndex] = useState(0);
-  const [read, setRead] = useState(false);
+  const [hasListened, setHasListened] = useState(false);
+  const [hasRead, setHasRead] = useState(false);
   const current = game.cards[index];
   const isLast = index === game.cards.length - 1;
 
   useEffect(() => {
-    setRead(false);
+    setHasListened(false);
+    setHasRead(false);
   }, [index]);
 
   const speak = () => {
     Speech.speak(current, { language: 'fr-FR', rate: 0.7 });
-    setRead(true);
+    setHasListened(true);
+  };
+
+  const markRead = () => {
+    setHasRead(true);
+    Speech.speak('Bravo !', { language: 'fr-FR' });
   };
 
   const next = () => {
+    if (!hasRead) return;
     if (isLast) {
       onComplete(3);
     } else {
@@ -51,23 +59,35 @@ export default function ReadCardGameView({ game, levelColor, onComplete }: Props
       <View style={styles.actions}>
         <TouchableOpacity style={[styles.btn, styles.listenBtn]} onPress={speak} activeOpacity={0.8}>
           <Text style={styles.btnIcon}>🔊</Text>
-          <Text style={[styles.btnText, { color: levelColor }]}>Ecouter</Text>
+          <Text style={[styles.btnText, { color: levelColor }]}>Écouter</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.btn, styles.readBtn, { backgroundColor: read ? levelColor : COLORS.border }]}
-          onPress={next}
+          style={[styles.btn, styles.readBtn, { backgroundColor: hasRead ? levelColor : COLORS.card, borderColor: hasRead ? levelColor : COLORS.border }]}
+          onPress={markRead}
           activeOpacity={0.8}
         >
           <Text style={styles.btnIcon}>✅</Text>
-          <Text style={[styles.btnText, { color: read ? COLORS.textWhite : COLORS.textLight }]}>
-            {read ? (isLast ? 'Terminé !' : 'Suivant') : "J'ai lu !"}
+          <Text style={[styles.btnText, { color: hasRead ? COLORS.textWhite : levelColor }]}>J'ai lu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.btn, styles.nextBtn, { backgroundColor: hasRead ? levelColor : COLORS.border }]}
+          onPress={next}
+          activeOpacity={hasRead ? 0.8 : 1}
+        >
+          <Text style={styles.btnIcon}>➡️</Text>
+          <Text style={[styles.btnText, { color: hasRead ? COLORS.textWhite : COLORS.textLight }]}>
+            {isLast ? 'Terminer' : 'Suivant'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      {!read && (
+      {!hasListened && (
         <Text style={styles.hint}>Appuie sur 🔊 pour écouter</Text>
+      )}
+      {hasListened && !hasRead && (
+        <Text style={styles.hint}>Lis la carte, puis appuie sur ✅</Text>
       )}
     </View>
   );
@@ -111,6 +131,8 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: SPACING.md,
   },
   btn: {
@@ -128,6 +150,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   readBtn: {},
+  nextBtn: {},
   btnIcon: {
     fontSize: 20,
   },
