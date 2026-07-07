@@ -1,4 +1,5 @@
 import { Mission, Game, FindSyllableGame, ReadCardGame, MemoryGame } from '../types';
+import { consonants, letters, vowels } from '../data/letters';
 import { getLevelById } from '../data/levels';
 
 function shuffle<T>(arr: T[]): T[] {
@@ -33,16 +34,39 @@ function buildMemoryGame(items: string[]): MemoryGame {
   return { type: 'memory', cards: [...base, ...base] };
 }
 
+function buildLetterFamilyGames(): Game[] {
+  const vowel = pickRandom(vowels, 1)[0];
+  const consonant = pickRandom(consonants, 1)[0];
+  const sortLetter = pickRandom(letters, 1)[0];
+  const vowelChoices = shuffle([pickRandom(vowels, 1)[0], ...pickRandom(consonants, 2)]);
+  const consonantChoices = shuffle([...pickRandom(vowels, 2), pickRandom(consonants, 1)[0]]);
+  const memoryCards = [
+    ...pickRandom(vowels, 2),
+    ...pickRandom(consonants, 2),
+  ];
+
+  return [
+    { type: 'letter_family_intro' },
+    { type: 'observe_letters', examples: [vowel, consonant] },
+    { type: 'sort_letter', letter: sortLetter },
+    { type: 'find_vowel', choices: vowelChoices },
+    { type: 'find_consonant', choices: consonantChoices },
+    { type: 'letter_family_memory', cards: memoryCards },
+  ];
+}
+
 export function generateMission(levelId: number): Mission {
   const level = getLevelById(levelId);
   if (!level) throw new Error(`Level ${levelId} not found`);
 
   const { items } = level;
-  const games: Game[] = [
-    buildFindSyllableGame(items),
-    buildReadCardGame(items),
-    buildMemoryGame(items),
-  ];
+  const games: Game[] = level.type === 'letter_families'
+    ? buildLetterFamilyGames()
+    : [
+        buildFindSyllableGame(items),
+        buildReadCardGame(items),
+        buildMemoryGame(items),
+      ];
 
   return {
     id: `${levelId}-${Date.now()}`,

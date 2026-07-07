@@ -43,3 +43,21 @@ export async function getActiveProfileId(): Promise<string | null> {
 export async function setActiveProfileId(id: string): Promise<void> {
   await AsyncStorage.setItem(ACTIVE_PROFILE_KEY, id);
 }
+
+export async function createProfile(profile: ChildProfile): Promise<void> {
+  await saveProfile(profile);
+  await setActiveProfileId(profile.id);
+}
+
+export async function getActiveProfile(): Promise<ChildProfile | null> {
+  const profiles = await getProfiles();
+  if (profiles.length === 0) return null;
+
+  const activeId = await getActiveProfileId();
+  const activeProfile = profiles.find((profile) => profile.id === activeId);
+  if (activeProfile) return activeProfile;
+
+  const [firstProfile] = profiles;
+  await setActiveProfileId(firstProfile.id);
+  return firstProfile;
+}
