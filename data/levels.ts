@@ -3,12 +3,12 @@ import { Level } from '../types';
 export const LEVELS: Level[] = [
   {
     id: 1,
-    title: 'Les voyelles',
-    description: 'Découvre les voyelles A E I O U',
+    title: 'Les deux familles de lettres',
+    description: 'Découvre les voyelles et les consonnes',
     color: '#FF6B6B',
-    icon: '🔤',
-    items: ['A', 'E', 'I', 'O', 'U'],
-    type: 'vowels',
+    icon: '🏠',
+    items: ['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Z'],
+    type: 'letter_families',
   },
   {
     id: 2,
