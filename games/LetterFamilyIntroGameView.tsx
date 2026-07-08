@@ -69,6 +69,7 @@ export default function LetterFamilyIntroGameView({ onComplete }: Props) {
             isHinted={highlightedFamily === 'vowel'}
             showTitle={false}
             showLetters={false}
+            compact
           />
           <Text style={styles.houseLabel}>Maison des voyelles</Text>
         </View>
@@ -78,34 +79,52 @@ export default function LetterFamilyIntroGameView({ onComplete }: Props) {
             isHinted={highlightedFamily === 'consonant'}
             showTitle={false}
             showLetters={false}
+            compact
           />
           <Text style={styles.houseLabel}>Maison des consonnes</Text>
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.replayButton}
-        onPress={playNarration}
-        activeOpacity={0.78}
-        accessibilityRole="button"
-        accessibilityLabel="Réécouter la narration"
-      >
-        <Text style={styles.replayText}>🔊 Réécouter</Text>
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.replayButton}
+          onPress={playNarration}
+          activeOpacity={0.78}
+          accessibilityRole="button"
+          accessibilityLabel="Réécouter la narration"
+        >
+          <Text style={styles.replayText}>🔊 Réécouter</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => onComplete(3)} activeOpacity={0.86}>
-        <Text style={styles.buttonText}>🟠 On joue !</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => onComplete(3)} activeOpacity={0.86}>
+          <Text style={styles.buttonText}>🟠 On joue !</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: SPACING.lg, gap: SPACING.lg },
-  title: { fontFamily: FONT.extraBold, fontSize: 26, color: COLORS.text, textAlign: 'center' },
-  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 560 },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xxl,
+    paddingBottom: SPACING.lg,
+    gap: SPACING.md,
+  },
+  title: { fontFamily: FONT.extraBold, fontSize: 25, color: COLORS.text, textAlign: 'center' },
+  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 560, flexShrink: 0 },
   houseColumn: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACING.sm },
-  houseLabel: { fontFamily: FONT.extraBold, fontSize: 17, color: COLORS.text, textAlign: 'center' },
+  houseLabel: {
+    fontFamily: FONT.extraBold,
+    fontSize: 16,
+    lineHeight: 21,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  actions: { alignItems: 'center', gap: SPACING.sm, width: '100%' },
   replayButton: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
@@ -117,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.secondary,
     borderRadius: 999,
     paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.sm,
   },
   buttonText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.textWhite },
 });

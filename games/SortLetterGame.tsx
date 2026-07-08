@@ -50,7 +50,7 @@ export default function SortLetterGame({ game, onComplete }: Props) {
   return (
     <View style={styles.container}>
       <AudioInstruction text={`Où habite le ${game.letter.text} ?`} audio="sort_letter.mp3" />
-      <LetterCard letter={game.letter} />
+      <LetterCard letter={game.letter} size="md" />
 
       {selected && (
         <View style={selected === game.letter.type ? styles.bravoBox : styles.hintBox}>
@@ -70,6 +70,8 @@ export default function SortLetterGame({ game, onComplete }: Props) {
           isCorrect={selected === 'vowel' && game.letter.type === 'vowel'}
           isWrong={selected === 'vowel' && game.letter.type !== 'vowel'}
           isHinted={selected !== null && game.letter.type === 'vowel' && selected !== 'vowel'}
+          showLetters={false}
+          compact
         />
         <LetterFamilyHouse
           family="consonant"
@@ -78,6 +80,8 @@ export default function SortLetterGame({ game, onComplete }: Props) {
           isCorrect={selected === 'consonant' && game.letter.type === 'consonant'}
           isWrong={selected === 'consonant' && game.letter.type !== 'consonant'}
           isHinted={selected !== null && game.letter.type === 'consonant' && selected !== 'consonant'}
+          showLetters={false}
+          compact
         />
       </View>
     </View>
@@ -85,9 +89,9 @@ export default function SortLetterGame({ game, onComplete }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', paddingTop: SPACING.md },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingTop: SPACING.sm },
   instruction: { fontFamily: FONT.extraBold, fontSize: 22, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.md },
-  houses: { gap: SPACING.md, width: '100%', maxWidth: 460, marginTop: SPACING.lg },
+  houses: { flexDirection: 'row', gap: SPACING.md, width: '100%', maxWidth: 520, marginTop: SPACING.md },
   bravoBox: { backgroundColor: '#E8FBF5', borderRadius: RADIUS.xl, padding: SPACING.md, marginTop: SPACING.sm },
   hintBox: { backgroundColor: '#FFF8E8', borderRadius: RADIUS.xl, padding: SPACING.md, marginTop: SPACING.sm },
   bravoText: { fontFamily: FONT.extraBold, fontSize: 18, color: COLORS.success, textAlign: 'center' },
