@@ -12,6 +12,7 @@ interface Props {
   isHinted?: boolean;
   showTitle?: boolean;
   showLetters?: boolean;
+  compact?: boolean;
 }
 
 const FAMILY_INFO = {
@@ -38,6 +39,7 @@ export default function LetterFamilyHouse({
   isHinted,
   showTitle = true,
   showLetters = true,
+  compact = false,
 }: Props) {
   const info = FAMILY_INFO[family];
   const pulse = useRef(new Animated.Value(1)).current;
@@ -68,6 +70,7 @@ export default function LetterFamilyHouse({
     <Animated.View
       style={[
         styles.house,
+        compact && styles.compactHouse,
         { borderColor: info.color, backgroundColor: `${info.color}18` },
         isSelected && { shadowColor: info.color },
         isCorrect && { backgroundColor: `${info.color}28`, borderColor: info.color, shadowColor: info.color },
@@ -76,9 +79,11 @@ export default function LetterFamilyHouse({
         animatedStyle,
       ]}
     >
-      <Text style={styles.icon}>{info.icon}</Text>
-      {showTitle ? <Text style={[styles.title, { color: info.color }]}>{info.title}</Text> : null}
-      {showLetters ? <Text style={styles.letters}>{info.letters}</Text> : null}
+      <Text style={[styles.icon, compact && styles.compactIcon]}>{info.icon}</Text>
+      {showTitle ? (
+        <Text style={[styles.title, compact && styles.compactTitle, { color: info.color }]}>{info.title}</Text>
+      ) : null}
+      {showLetters ? <Text style={[styles.letters, compact && styles.compactLetters]}>{info.letters}</Text> : null}
     </Animated.View>
   );
 
@@ -108,8 +113,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 5,
   },
+  compactHouse: { minHeight: 142, padding: SPACING.sm, borderWidth: 3 },
   icon: { fontSize: 44, marginBottom: SPACING.sm },
+  compactIcon: { fontSize: 36, marginBottom: 0 },
   title: { fontFamily: FONT.extraBold, fontSize: 20, textAlign: 'center', marginBottom: SPACING.sm },
+  compactTitle: { fontSize: 17 },
   letters: { fontFamily: FONT.bold, fontSize: 15, color: COLORS.text, textAlign: 'center', lineHeight: 22 },
+  compactLetters: { fontSize: 13, lineHeight: 18 },
   wrong: { opacity: 0.72 },
 });
