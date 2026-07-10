@@ -179,3 +179,69 @@ export interface Level {
   items: string[];
   type: LevelType;
 }
+
+export type LearningItemType = 'letter' | 'syllable' | 'word';
+
+export type LearningItemId =
+  | `letter:${string}`
+  | `syllable:${string}`
+  | `word:${string}`;
+
+export type SkillId =
+  | 'distinguish_vowel_consonant'
+  | 'recognize_letter'
+  | 'associate_letter_family'
+  | 'blend_consonant_vowel'
+  | 'recognize_spoken_syllable'
+  | 'read_syllable'
+  | 'match_identical_syllables'
+  | 'identify_same_initial_consonant'
+  | 'assemble_word'
+  | 'read_word';
+
+export interface SkillDefinition {
+  id: SkillId;
+  title: string;
+  description: string;
+  itemTypes: LearningItemType[];
+  prerequisiteSkillIds: SkillId[];
+}
+
+export interface ParsedLearningItemId {
+  type: LearningItemType;
+  key: string;
+  id: LearningItemId;
+}
+
+export interface BaseLearningItem {
+  id: LearningItemId;
+  type: LearningItemType;
+  displayText: string;
+  audioText: string;
+  skillIds: SkillId[];
+  difficulty: number;
+  prerequisiteItemIds: LearningItemId[];
+  tags: string[];
+}
+
+export interface LetterLearningItem extends BaseLearningItem {
+  type: 'letter';
+  letter: string;
+  family: LetterFamily;
+}
+
+export interface SyllableLearningItem extends BaseLearningItem {
+  type: 'syllable';
+  syllable: string;
+  consonant: string;
+  vowel: string;
+  pattern: 'CV';
+}
+
+export interface WordLearningItem extends BaseLearningItem {
+  type: 'word';
+  word: string;
+  syllableIds: LearningItemId[];
+}
+
+export type LearningItem = LetterLearningItem | SyllableLearningItem | WordLearningItem;
