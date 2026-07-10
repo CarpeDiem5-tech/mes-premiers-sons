@@ -6,107 +6,114 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { COLORS, FONT, SPACING, RADIUS } from '../../utils/theme';
-import MissionCard from '../../components/MissionCard';
+import GameCatalogCard from '../../components/GameCatalogCard';
 import StarCounter from '../../components/StarCounter';
-import ProgressBar from '../../components/ProgressBar';
 import { getActiveProfile } from '../../storage/profiles';
 import { getProgress } from '../../storage/progress';
-import { getLevelById, TOTAL_LEVELS } from '../../data/levels';
-import { ChildProfile, ChildProgress } from '../../types';
+import { GAME_CATALOG } from '../../data/gameCatalog';
+import { ChildProfile, ChildProgress, GameId } from '../../types';
 
 export default function HomeScreen() {
   const [profile, setProfile] = useState<ChildProfile | null>(null);
   const [progress, setProgress] = useState<ChildProgress | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+  const isTwoColumns = width >= 430;
 
   useFocusEffect(
     useCallback(() => {
+      let isActive = true;
+
       (async () => {
         const p = await getActiveProfile();
         if (!p) { router.replace('/(onboarding)'); return; }
+        if (!isActive) return;
+
         setProfile(p);
-        const prog = await getProgress(p.id);
-        setProgress(prog);
+        try {
+          const prog = await getProgress(p.id);
+          if (isActive) setProgress(prog);
+        } catch {
+          if (isActive) setProgress(null);
+        }
       })();
+
+      return () => {
+        isActive = false;
+      };
     }, [])
   );
 
-  if (!profile || !progress) return null;
+  if (!profile) return null;
 
-  const level = getLevelById(progress.currentLevel);
-  const lastMissionLevel = getLevelById(progress.lastMissionLevelId);
-  if (!level) return null;
+  const openGame = (gameId: GameId) => {
+    const game = GAME_CATALOG.find((item) => item.id === gameId);
+    if (!game) return;
 
-  const missionsDoneThisLevel = progress.completedMissionIds.filter((id) =>
-    id.startsWith(`${progress.currentLevel}-`)
-  ).length;
-  const levelProgress = Math.min(missionsDoneThisLevel / 3, 1);
+    if (game.availability === 'coming_soon') {
+      setMessage('Ce jeu arrive bientôt.');
+      return;
+    }
+
+    setMessage(null);
+    router.push({ pathname: '/game/[gameId]', params: { gameId: game.id } });
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Bonjour {profile.name}</Text>
-            <Text style={styles.name}>{profile.avatar} Mission du jour</Text>
-          </View>
-          <StarCounter count={progress.totalStars} size="md" />
-        </View>
-
-        <MissionCard
-          onPress={() => router.push({ pathname: '/mission', params: { levelId: String(progress.currentLevel) } })}
-          levelTitle={level.title}
-          levelIcon={level.icon}
-          estimatedMinutes={5}
-        />
-
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>🎯</Text>
-            <Text style={styles.statValue}>{progress.completedMissionIds.length}</Text>
-            <Text style={styles.statLabel}>Missions</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>📚</Text>
-            <Text style={styles.statValue}>{progress.currentLevel}/{TOTAL_LEVELS}</Text>
-            <Text style={styles.statLabel}>Niveau</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statEmoji}>🕐</Text>
-            <Text style={styles.statValue}>{progress.lastMissionDate ? lastMissionLevel?.title ?? 'Mission' : 'Aucune'}</Text>
-            <Text style={styles.statLabel}>Dernière mission</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Niveau en cours</Text>
-            <Text style={styles.sectionSub}>{level.title}</Text>
-          </View>
-          <View style={styles.levelProgressBox}>
-            <View style={[styles.levelIconCircle, { backgroundColor: level.color + '22' }]}>
-              <Text style={styles.levelIcon}>{level.icon}</Text>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => router.push('/(main)/profiles')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Changer de profil"
+          >
+            <Text style={styles.avatar}>{profile.avatar}</Text>
+            <View>
+              <Text style={styles.greeting}>Bonjour</Text>
+              <Text style={styles.name}>{profile.name}</Text>
             </View>
-            <View style={styles.levelInfo}>
-              <Text style={styles.levelDesc}>{level.description}</Text>
-              <ProgressBar progress={levelProgress} color={level.color} height={10} />
-              <Text style={styles.levelSub}>{missionsDoneThisLevel}/3 missions pour avancer</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
+          <StarCounter count={progress?.totalStars ?? 0} size="md" />
         </View>
 
-        <View style={styles.syllablesBox}>
-          <Text style={styles.syllablesTitle}>Ce qu'on apprend :</Text>
-          <View style={styles.syllablesRow}>
-            {level.items.slice(0, 6).map((item) => (
-              <View key={item} style={[styles.syllablePill, { backgroundColor: level.color + '22' }]}>
-                <Text style={[styles.syllableText, { color: level.color }]}>{item}</Text>
-              </View>
-            ))}
-          </View>
+        <View style={styles.hero}>
+          <Text style={styles.heroTitle}>À quoi veux-tu jouer ?</Text>
+          <Text style={styles.heroSubtitle}>Choisis un jeu.</Text>
         </View>
+
+        {message && (
+          <View style={styles.messageBox}>
+            <Text style={styles.messageText}>{message}</Text>
+          </View>
+        )}
+
+        <View style={[styles.grid, !isTwoColumns && styles.gridSingleColumn]}>
+          {GAME_CATALOG.map((game) => (
+            <GameCatalogCard
+              key={game.id}
+              game={game}
+              progress={progress?.gameProgress?.[game.id]}
+              onPress={() => openGame(game.id)}
+            />
+          ))}
+        </View>
+
+        {progress && (
+          <TouchableOpacity
+            style={styles.guidedLink}
+            onPress={() => router.push({ pathname: '/mission', params: { levelId: String(progress.currentLevel) } })}
+            activeOpacity={0.75}
+          >
+            <Text style={styles.guidedLinkText}>Parcours guidé</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -118,72 +125,90 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.xl,
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    gap: SPACING.md,
   },
-  greeting: { fontFamily: FONT.semiBold, fontSize: 16, color: COLORS.textLight },
-  name: { fontFamily: FONT.extraBold, fontSize: 26, color: COLORS.text, marginTop: 2 },
-  statsRow: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.xl,
-  },
-  statCard: {
+  profileButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  avatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: COLORS.card,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    fontSize: 30,
+    lineHeight: 54,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  greeting: { fontFamily: FONT.semiBold, fontSize: 15, color: COLORS.textLight },
+  name: { fontFamily: FONT.extraBold, fontSize: 24, color: COLORS.text, marginTop: 1 },
+  hero: {
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 6,
+  },
+  heroTitle: {
+    fontFamily: FONT.extraBold,
+    fontSize: 29,
+    color: COLORS.textWhite,
+    textAlign: 'center',
+  },
+  heroSubtitle: {
+    fontFamily: FONT.bold,
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.85)',
+    textAlign: 'center',
+    marginTop: SPACING.xs,
+  },
+  messageBox: {
+    backgroundColor: '#FFF4D6',
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
-    alignItems: 'center',
-    shadowColor: 'rgba(0,0,0,0.05)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 2,
+    marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: '#FFE4A3',
   },
-  statEmoji: { fontSize: 22, marginBottom: 4 },
-  statValue: { fontFamily: FONT.extraBold, fontSize: 15, color: COLORS.text, textAlign: 'center' },
-  statLabel: { fontFamily: FONT.regular, fontSize: 11, color: COLORS.textLight, marginTop: 2, textAlign: 'center' },
-  section: { marginBottom: SPACING.lg },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.sm },
-  sectionTitle: { fontFamily: FONT.bold, fontSize: 17, color: COLORS.text },
-  sectionSub: { fontFamily: FONT.semiBold, fontSize: 13, color: COLORS.textLight },
-  levelProgressBox: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.md,
+  messageText: {
+    fontFamily: FONT.extraBold,
+    fontSize: 15,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  grid: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: SPACING.md,
-    shadowColor: 'rgba(0,0,0,0.05)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 2,
   },
-  levelIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+  gridSingleColumn: {
+    flexDirection: 'column',
   },
-  levelIcon: { fontSize: 28 },
-  levelInfo: { flex: 1, gap: 6 },
-  levelDesc: { fontFamily: FONT.semiBold, fontSize: 14, color: COLORS.text },
-  levelSub: { fontFamily: FONT.regular, fontSize: 12, color: COLORS.textLight },
-  syllablesBox: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.md,
-    shadowColor: 'rgba(0,0,0,0.05)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 2,
+  guidedLink: {
+    alignSelf: 'center',
+    marginTop: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    backgroundColor: 'rgba(255,255,255,0.65)',
   },
-  syllablesTitle: { fontFamily: FONT.bold, fontSize: 15, color: COLORS.text, marginBottom: SPACING.sm },
-  syllablesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  syllablePill: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderRadius: RADIUS.full },
-  syllableText: { fontFamily: FONT.extraBold, fontSize: 18 },
+  guidedLinkText: {
+    fontFamily: FONT.bold,
+    fontSize: 14,
+    color: COLORS.textLight,
+  },
 });
