@@ -6,6 +6,65 @@ export interface ChildProfile {
   createdAt: string;
 }
 
+export type GameId =
+  | 'alphabet_houses'
+  | 'magic_syllable'
+  | 'sound_train'
+  | 'memory_express'
+  | 'house_hunt'
+  | 'vowel_basket'
+  | 'true_or_funny'
+  | 'word_puzzle';
+
+export interface GameProgress {
+  gameId: GameId;
+
+  // Progression interne invisible pour l’enfant
+  stage: number;
+
+  totalSessions: number;
+  completedSessions: number;
+
+  totalCorrectAnswers: number;
+  totalAttempts: number;
+
+  currentStreak: number;
+  bestStreak: number;
+
+  totalStarsEarned: number;
+  bestStarsInSession: number;
+
+  successfulSessionsAtCurrentStage: number;
+
+  lastPlayedAt: string | null;
+
+  practicedItemIds: string[];
+  masteredItemIds: string[];
+}
+
+export interface GameSessionResult {
+  gameId: GameId;
+  stage: number;
+
+  correctAnswers: number;
+  totalAttempts: number;
+  starsEarned: number;
+  durationSeconds: number;
+
+  practicedItemIds: string[];
+  masteredItemIds: string[];
+
+  completed: boolean;
+  completedAt: string;
+}
+
+export interface GameScreenProps {
+  profile: ChildProfile;
+  progress: GameProgress;
+  onComplete: (result: GameSessionResult) => void;
+  onExit: () => void;
+}
+
 export interface ChildProgress {
   profileId: string;
   currentLevel: number;
@@ -13,6 +72,13 @@ export interface ChildProgress {
   completedMissionIds: string[];
   lastMissionDate: string | null;
   lastMissionLevelId: number;
+  schemaVersion: number;
+  gameProgress: Partial<Record<GameId, GameProgress>>;
+  legacyStats?: {
+    totalStarsBeforeGameLibrary: number;
+    completedMissionCount: number;
+    migratedAt: string;
+  };
 }
 
 export type LetterFamily = 'vowel' | 'consonant';
